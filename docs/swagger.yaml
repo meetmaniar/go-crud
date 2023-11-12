@@ -1,0 +1,55 @@
+basePath: /
+definitions:
+  main.Job:
+    properties:
+      job:
+        description: 'the convention is key:value and not key: value -> `json:"job"`
+          and not `json: "job"`'
+        example: Software Developer
+        type: string
+      jobId:
+        example: job_1
+        type: string
+    type: object
+  main.User:
+    properties:
+      id:
+        example: user_1
+        type: string
+      job:
+        $ref: '#/definitions/main.Job'
+      name:
+        example: John Doe
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: nocontact@domain.com
+    name: API Support
+  description: This is a sample service for managing users
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: User API
+  version: "1.0"
+paths:
+  /createUsers:
+    post:
+      consumes:
+      - application/json
+      description: POST create new User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.User'
+            type: array
+      summary: POST Create new User
+      tags:
+      - User
+swagger: "2.0"
