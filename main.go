@@ -9,19 +9,28 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Job struct {
-	JobId string `json:"jobId"`
-	Job   string `json:"job"` // the convention is key:value and not key: value -> `json:"job"` and not `json: "job"`
+	JobId string `json:"jobId" example:"job_1"`
+	Job   string `json:"job" example:"Software Developer"` // the convention is key:value and not key: value -> `json:"job"` and not `json: "job"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   string `json:"id" example:"user_1"`
+	Name string `json:"name" example:"John Doe"`
 	Job  *Job   `json:"job"`
 }
 
+// createUser godoc
+// @Summary POST Create new User
+// @Description POST create new User
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} User
+// @Router /createUsers [post]
 func createUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 	var user User
@@ -91,16 +100,27 @@ func deleteUser(response http.ResponseWriter, request *http.Request) {
 
 var users []User
 
+// @title User API
+// @version 1.0
+// @description This is a sample service for managing users
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email nocontact@domain.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8000
+// @BasePath /
 func main() {
 	users = append(users, User{ID: "user_1", Name: "John Doe", Job: &Job{JobId: "job_1", Job: "Software Engineer"}})
 	users = append(users, User{ID: "user_2", Name: "Harry Potter", Job: &Job{JobId: "job_2", Job: "Wizard"}})
-	r := mux.NewRouter()
-	r.HandleFunc("/users", getUsers).Methods("GET")
-	r.HandleFunc("/users/{id}", getUser).Methods("GET")
-	r.HandleFunc("/createUser", createUser).Methods("POST")
-	r.HandleFunc("/updateUser/{id}", updateUser).Methods("PUT")
-	r.HandleFunc("/deleteUser/{id}", deleteUser).Methods("DELETE")
+	router := mux.NewRouter()
+	router.HandleFunc("/users", getUsers).Methods("GET")
+	router.HandleFunc("/users/{id}", getUser).Methods("GET")
+	router.HandleFunc("/createUser", createUser).Methods("POST")
+	router.HandleFunc("/updateUser/{id}", updateUser).Methods("PUT")
+	router.HandleFunc("/deleteUser/{id}", deleteUser).Methods("DELETE")
+	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 
 	fmt.Printf("Starting Server at 8000\n")
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
